@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luau Obfuscator</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --panel-color: #252526;
+            --text-color: #d4d4d4;
+            --accent-color: #007acc;
+            --border-color: #3e3e42;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--panel-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea {
+            flex-grow: 1;
+            background-color: #111;
+            color: #ce9178; /* String color */
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            height: 400px;
+            outline: none;
+        }
+
+        textarea:focus {
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .controls {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #005fa3;
+        }
+
+        button.secondary {
+            background-color: #3e3e42;
+        }
+
+        button.secondary:hover {
+            background-color: #505055;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            textarea {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Luau Obfuscator</h1>
+
+    <div class="controls">
+        <button onclick="obfuscate()">Obfuscate Code</button>
+        <button class="secondary" onclick="copyToClipboard()">Copy Result</button>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <label for="inputCode">Input (Clean Luau)</label>
+            <textarea id="inputCode" placeholder="-- Paste your script here...&#10;print('Hello World')"></textarea>
+        </div>
+        <div class="panel">
+            <label for="outputCode">Output (Obfuscated)</label>
+            <textarea id="outputCode" readonly placeholder="Result will appear here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Helper to generate random variable names
+        function getRandomVarName(length = 12) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let result = '_'; // Start with underscore to be safe
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function obfuscate() {
+            const input = document.getElementById('inputCode').value;
+            
+            if (!input.trim()) {
+                alert("Please enter some code to obfuscate.");
+                return;
+            }
+
+            try {
+                // 1. Convert string to Byte Array
+                const bytes = [];
+                for (let i = 0; i < input.length; i++) {
+                    bytes.push(input.charCodeAt(i));
+                }
+
+                // 2. Generate unique variable names
+                const varLoadstring = getRandomVarName();
+                const varTable = getRandomVarName();
+                
+                // 3. Construct the payload
+                // We construct a string that looks like: 
+                --[[ 
+                   local _randomVar = loadstring(string.char(112, 114, ...))
+                   _randomVar()
+                ]]--
+
+                // Create the string.char arguments
+                const byteString = bytes.join(',');
+
+                // Build the final script
+                // Note: We use parentheses around loadstring(...) to ensure it returns the function before calling ()
+                const obfuscatedScript = `
+local ${varLoadstring} = loadstring(string.char(${byteString}))
+if ${varLoadstring} then
+    pcall(${varLoadstring})
+else
+    warn("Obfuscation Error: Script failed to load.")
+end
+`.trim();
+
+                document.getElementById('outputCode').value = obfuscatedScript;
+
+            } catch (e) {
+                console.error(e);
+                alert("An error occurred during obfuscation.");
+            }
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('outputCode');
+            if(!output.value) return;
+            
+            output.select();
+            output.setSelectionRange(0, 99999); // For mobile devices
+            
+            navigator.clipboard.writeText(output.value).then(() => {
+                const btn = document.querySelector('.secondary');
+                const originalText = btn.innerText;
+                btn.innerText = "Copied!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
