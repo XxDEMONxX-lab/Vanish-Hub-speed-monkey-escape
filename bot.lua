@@ -1,4 +1,3 @@
--- bot.lua | Discord Bot using Discordia
 local discordia = require("discordia")
 local http = require("coro-http")
 local json = require("json")
