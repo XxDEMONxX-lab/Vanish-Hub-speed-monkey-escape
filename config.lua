@@ -7,4 +7,4 @@ Config.WATERMARK = "--[[\n\t🌙 Obfuscated by Lunaris Obfuscator\n\tProtected S
 Config.MAX_FILE_SIZE = 512000
 Config.SUPPORTED_EXTENSIONS = { lua = true, luau = true, txt = true, rbxlua = true }
 
-return
+return Config
