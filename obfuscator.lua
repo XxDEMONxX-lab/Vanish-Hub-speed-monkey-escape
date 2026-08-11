@@ -1,4 +1,3 @@
--- obfuscator.lua | Token-Based Obfuscation Engine
 local Obfuscator = {}
 local Config = require("config")
 
