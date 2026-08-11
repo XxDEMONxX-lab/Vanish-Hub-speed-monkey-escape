@@ -1,4 +1,7 @@
--- app.lua | Lunaris Obfuscator Entry Point
+-- Add lit deps to module search path BEFORE any requires
+package.path = "./deps/?.lua;./deps/?/init.lua;" .. package.path
+package.cpath = "./deps/?.so;" .. package.cpath
+
 local Config = require("config")
 
 assert(Config.BOT_TOKEN ~= "YOUR_DISCORD_BOT_TOKEN_HERE",
