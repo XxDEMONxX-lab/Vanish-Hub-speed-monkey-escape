@@ -65,7 +65,7 @@ local BigNum = {
 -- BigNum stub used
 
 local Window = Library:CreateWindow({
-    Title = "Vanish Hub +1 speed monkey escape",
+    Title = "Vanish Hub",
     Footer = {"Vanish Hub +1 speed monkey escape on Rscripts, leave a like if it works. |", {Text=GameName, Copyable=false}},
     CopyableFooter=false, Center=true, AutoShow=true, Resizable=true, ShowCustomCursor=true, NotifySide="Right",
     SearchbarSize=UDim2.fromScale(0.35,1), FuzzySearch=true, SearchValues=true, Minimizable=true, CornerRadius=10, ToggleKeybind=Enum.KeyCode.RightShift,
@@ -981,7 +981,7 @@ SaveManager:BuildConfigSection(Tabs.Settings)
 ThemeManager:ApplyToTab(Tabs.Settings)
 SaveManager:LoadAutoloadConfig()
 
-Library:Notify({Title="Vanish Hub +1 speed monkey escape", Description=GameName.." hybrid loaded. Best unlocked train + best win + tails fixed.", Time=5})
+Library:Notify({Title="Vanish Hub", Description=GameName.." hybrid loaded. Best unlocked train + best win + tails fixed.", Time=5})
 Library:OnUnload(function()
     for id,_ in pairs(Loops) do stopLoop(id) end
     if AntiAFKConn then AntiAFKConn:Disconnect() end
